@@ -39,7 +39,7 @@ print "Looking for DNSKEYs for $domain on localhost\n";
 my $query = $resolver->query($domain, 'DNSKEY');
 if($query) {
 	foreach my $rr ($query->answer) {
-		next unless $rr->flags eq 257;
+		next unless $rr->flags == 257;
 		print "Found KSK. Checking it's on the nameservers...\n";
 		my $nsQuery = $resolver->query($domain, 'NS');
 		my($found_keys, $found_ns);
@@ -50,7 +50,7 @@ if($query) {
 				my $nsCheck = $resolver->query($domain, 'DNSKEY');
 				if($nsCheck) {
 					foreach my $dnskeyrr ($nsCheck->answer) {
-						next unless $dnskeyrr->flags eq 257;
+						next unless $dnskeyrr->flags == 257;
 						if($dnskeyrr->key == $rr->key) {
 							print "OK ";
 							$found_keys++;
@@ -63,7 +63,7 @@ if($query) {
 				$found_ns++;
 			}
 		}
-		if($found_keys eq $found_ns) {
+		if($found_keys == $found_ns) {
 			print "Found key on all $found_ns nameservers. Preparing to publish to TLD via Gandi.\n";
 			submit_ds_to_gandi($domain, $rr);
 		} else {
