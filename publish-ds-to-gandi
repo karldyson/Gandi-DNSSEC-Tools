@@ -31,11 +31,14 @@ my $endpoint = $config->{'endpoint'} || die "no endpoint in config file\n";
 my $apikey = $config->{'apikey'} || die "no apikey in config file\n";
 
 my $domain = shift || die "no domain specified\n";
+my $ns = shift || '127.0.0.1';
+
+warn "NON LOCAL NS USED\n" unless $ns !~ m/127.0.0.1|::1|localhost/;
 
 my $resolver = Net::DNS::Resolver->new;
 $resolver->recurse(0);
-$resolver->nameservers('127.0.0.1');
-print "Looking for DNSKEYs for $domain on localhost\n";
+$resolver->nameservers($ns);
+print "Looking for DNSKEYs for $domain on $ns\n";
 my $query = $resolver->query($domain, 'DNSKEY');
 if($query) {
 	foreach my $rr ($query->answer) {
